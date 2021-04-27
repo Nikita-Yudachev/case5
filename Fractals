@@ -1,0 +1,222 @@
+"""
+CASE: 5
+Yudachev Nikita -70%
+Kuleshov Roman - 30%
+"""
+import turtle as t
+
+t.speed(0)
+t.tracer(50)
+
+list_Available_Fractals = ['1: Бесконенчый квадрат.', '2: Двоичное дерево.', '3: Ветка.', '4: Кривая Коха.',
+                           '5: Снежинка Коха.', '6: Кривая Минковского.', '7: Кривая Леви.', '8: Ледяныой фрактал №1.',
+                           '9: Ледяныой фрактал №2.', '10: Фрактал Дракон Хартера-Хейтуэя.',
+                           '11: Фрактал Дракон Хартера-Хейтуэя 2X.', '12: Фрактал Дракон Хартера-Хейтуэя 3X.']
+print('Программа рисует выбранные фракталы.')
+for _ in range(len(list_Available_Fractals)):
+    print(list_Available_Fractals[_])
+User_selection_fractals = int(input('Выбирите номер фрактала из доступных: '))
+
+
+def kvadr(n_rec, size):
+    """Функция, которая рисует бесконечный квадрат"""
+    if size < n_rec:
+        return
+    t.up()
+    t.rt(10)
+    t.fd(size / 8)
+    t.down()
+    for _ in range(4):
+        t.fd(size)
+        t.rt(90)
+    t.up()
+    return kvadr(n_rec, size * 0.9)
+
+
+def derevo(n_rec, angle):
+    """Функция, которая рисует дерево"""
+    t.left(90)
+    t.backward(100)
+
+    def drawn(len):
+        if len < 25:
+            return
+        else:
+            t.forward(len)
+            t.left(angle)
+            drawn(3 * len / 4)
+            t.right(2 * angle)
+            drawn(3 * len / 4)
+            t.left(angle)
+            t.backward(len)
+
+    drawn(n_rec)
+
+
+def branch(n_rec, size):
+    """Функция, которая рисует ветку"""
+    if n_rec == 0:
+        t.left(180)
+        return
+    x = size / (n_rec + 1)
+    for i in range(n_rec):
+        t.forward(x)
+        t.left(45)
+        branch(n_rec - i - 1, 0.5 * x * (n_rec - i - 1))
+        t.left(90)
+        branch(n_rec - i - 1, 0.5 * x * (n_rec - i - 1))
+        t.right(135)
+    t.forward(x)
+    t.left(180)
+    t.forward(size)
+
+
+def koch(n_rec, size):
+    """Функция, которая рисует кривую Коха"""
+    if n_rec == 0:
+        t.forward(size)
+    else:
+        koch(n_rec - 1, size / 3)
+        t.left(60)
+        koch(n_rec - 1, size / 3)
+        t.right(120)
+        koch(n_rec - 1, size / 3)
+        t.left(60)
+        koch(n_rec - 1, size / 3)
+
+
+def ice_fractal(n_rec, size):
+    """Функция, которая рисует Ледяныой фрактал"""
+    if n_rec == 0:
+        t.forward(size)
+    else:
+        ice_fractal(n_rec-1, size/2)
+        t.left(90)
+        ice_fractal(n_rec-1, size/4)
+        ice_fractal(n_rec-1, -size/4)
+        t.right(90)
+        ice_fractal(n_rec-1, size/2)
+
+
+def ice_fractale(n_rec, size):
+    """Функция, которая рисует Ледяныой фрактал"""
+    if n_rec == 0:
+        t.forward(size)
+    else:
+        ice_fractale(n_rec - 1, size)
+        t.left(120)
+        ice_fractale(n_rec - 1, size/2)
+        t.right(180)
+        ice_fractale(n_rec - 1, size/2)
+        t.left(120)
+        ice_fractale(n_rec - 1, size/2)
+        t.right(180)
+        ice_fractale(n_rec - 1, size/2)
+        t.left(120)
+        ice_fractale(n_rec - 1, size)
+
+
+def create_l_system(recursion_depth, axiom, rules):
+    """Функция, которая создают строку, в которой написаны команды для рисовния."""
+    start_string = axiom
+    if recursion_depth == 0:
+        return axiom
+    end_string = ""
+    for _ in range(recursion_depth):
+        # for i in start_string:
+        #   if i in rules:
+        #      end_string += rules[i]
+        # else:
+        #    end_string += i
+        end_string = "".join(rules[i] if i in rules else i for i in start_string)
+        start_string = end_string
+    return end_string
+
+
+def draw_l_system(instructions, angle, len_side):
+    """Функция, которая рисует."""
+    for j in instructions:
+        if j == 'F':
+            t.forward(len_side)
+        elif j == '+':
+            t.right(angle)
+        elif j == '-':
+            t.left(angle)
+
+
+def draw(recursion_depth, axiom, rules, angle, len_side, y_offset=0, x_offset=0, offset_angle=0, width=800,
+         height=800):
+    """Функция, которая рисует получает необходимаые параметры для рисования фракталов."""
+    instructions = create_l_system(recursion_depth, axiom, rules)
+    t.screensize(width, height)
+    t.up()
+    t.backward(-x_offset)
+    t.backward(-y_offset)
+    t.left(offset_angle)
+    t.down()
+    draw_l_system(instructions, angle, len_side)
+
+
+def main1(user_selection_fractal):
+    """Функция, которая вызыввет, нужную, функцию для рисоваия фрактала."""
+    if user_selection_fractal == 1:
+        kvadr(int(input('Введите желаемою глубину рекурсии: ')), int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+    if user_selection_fractal == 2:
+        derevo(int(input('Введите желаемою высоту дерева: ')), int(input('Введите угол отклонение ветвей: ')))
+        t.mainloop()
+    if user_selection_fractal == 3:
+        t.up()
+        t.goto(0, -100)
+        t.left(90)
+        t.down()
+        branch(int(input('Введите желаемою глубину рекурсии: ')), int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+    if user_selection_fractal == 4:
+        t.up()
+        t.goto(-100, 0)
+        t.down()
+        koch(int(input('Введите желаемою глубину рекурсии: ')), int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+    if user_selection_fractal == 5:
+        draw(int(input('Введите желаемою глубину рекурсии: ')), "F--F--F", {"F": "F+F--F+F"}, 60,
+             int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+    if user_selection_fractal == 6:
+        draw(int(input('Введите желаемою глубину рекурсии: ')), "F", {"F": "F+F-F-FF+F+F-F"}, 90,
+             int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+    if user_selection_fractal == 7:
+        draw(int(input('Введите желаемою глубину рекурсии: ')), "F", {"F": "-F++F-"}, 45,
+             int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+    if user_selection_fractal == 8:
+        t.up()
+        t.goto(-300, 0)
+        t.down()
+        ice_fractal(int(input('Введите желаемою глубину рекурсии: ')), int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+    if user_selection_fractal == 9:
+        t.up()
+        t.goto(-300, 0)
+        t.down()
+        ice_fractale(int(input('Введите желаемою глубину рекурсии: ')), int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+    if user_selection_fractal == 10:
+        t.right(180)
+        draw(int(input('Введите желаемою глубину рекурсии: ')), "FX", {"X": "X+YF+", "Y": "-FX-Y"}, 90,
+             int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+    if user_selection_fractal == 11:
+        t.right(180)
+        draw(int(input('Введите желаемою глубину рекурсии: ')), "FX+FX", {"X": "X+YF+", "Y": "-FX-Y"}, 90,
+             int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+    if user_selection_fractal == 12:
+        t.right(180)
+        draw(int(input('Введите желаемою глубину рекурсии: ')), "FX+FX+FX", {"X": "X+YF+", "Y": "-FX-Y"}, 90,
+             int(input('Введите желаемою длину стороны: ')))
+        t.mainloop()
+
+
+main1(User_selection_fractals)
